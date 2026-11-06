@@ -1,5 +1,5 @@
 class Resultado:
-    """Lo que la interfaz recibe después de evaluar una fórmula."""
+    # Lo que la interfaz recibe después de evaluar una fórmula.
 
     def __init__(self, valor=None, explicacion="", errores=None, ruta=None, tipo=None):
         self.valor = valor              # True / False / None

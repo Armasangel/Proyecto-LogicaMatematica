@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 COLOR_VERDADERO = "#1e8e3e"
 COLOR_FALSO = "#d93025"
@@ -6,10 +7,10 @@ COLOR_ERROR = "#b06000"
 
 
 class PanelResultado(tk.Frame):
-    """Muestra Verdadero/Falso, la explicación o los errores."""
+    # Muestra Verdadero/Falso, la explicación o los errores.
 
     def __init__(self, padre):
-        super().__init__(padre, bg="#ffffff", padx=24, pady=16)
+        super().__init__(padre, bg="#ffffff", padx=24, pady=12)
 
         tk.Label(
             self, text="Resultado", bg="#ffffff",
@@ -19,13 +20,19 @@ class PanelResultado(tk.Frame):
         self.etiqueta_valor = tk.Label(
             self, text="—", bg="#ffffff", font=("Segoe UI", 18, "bold"),
         )
-        self.etiqueta_valor.pack(anchor="w", pady=(4, 8))
+        self.etiqueta_valor.pack(anchor="w", pady=(2, 6))
 
+        cuerpo = tk.Frame(self, bg="#ffffff")
+        cuerpo.pack(fill="both", expand=True)
+        barra = ttk.Scrollbar(cuerpo, orient="vertical")
+        barra.pack(side="right", fill="y")
         self.texto = tk.Text(
-            self, height=6, wrap="word", font=("Segoe UI", 11),
+            cuerpo, height=6, wrap="word", font=("Segoe UI", 11),
             bg="#f7f7f9", relief="flat", padx=8, pady=8,
+            yscrollcommand=barra.set,
         )
-        self.texto.pack(fill="both", expand=True)
+        self.texto.pack(side="left", fill="both", expand=True)
+        barra.configure(command=self.texto.yview)
         self.texto.configure(state="disabled")
 
     def mostrar(self, resultado):
