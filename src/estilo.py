@@ -1,0 +1,7 @@
+COLOR_FONDO = "#cfe0fb"
+COLOR_TARJETA = "#ffffff"
+COLOR_CAMPO = "#e9e9ec"
+COLOR_BOTON = "#f1f1f3"
+COLOR_PRIMARIO = "#1a73e8"
+COLOR_AYUDA = "#6b6b76"
+FUENTE = "Segoe UI"
