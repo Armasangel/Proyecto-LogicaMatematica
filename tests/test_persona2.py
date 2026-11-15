@@ -26,7 +26,7 @@ class SintaxisTests(unittest.TestCase):
         self.parser = AnalizadorSintactico()
 
     def test_tokens_posiciones(self):
-        tokens = tokenizar("  ¬P(x) -> P(a)")
+        tokens = tokenizar("  ¬P(x) → P(a)")
         self.assertEqual([(t.tipo, t.posicion) for t in tokens[:3]],
                          [("NO", 2), ("ID", 3), ("ABRE", 4)])
         self.assertEqual(tokens[-1].tipo, "FIN")
@@ -83,9 +83,10 @@ class SintaxisTests(unittest.TestCase):
         self.assertEqual(variables_libres(f), set())
         self.assertEqual(variables_ligadas(f), {"x"})
 
-    def test_alias_ascii(self):
-        self.assertEqual(self.parser.analizar("forall x. (~P(x) | P(a)) -> exists y P(y)"),
-                         self.parser.analizar("∀x(¬P(x) ∨ P(a)) → ∃y P(y)"))
+    def test_alias_ascii_ya_no_se_aceptan(self):
+        for texto in ["~P(a)", "P(a) & P(a)", "P(a) | P(a)", "P(a) -> P(a)"]:
+            with self.subTest(texto=texto), self.assertRaises(ErrorValidacion):
+                self.parser.analizar(texto)
 
     def test_firma_personalizada_y_aridad_cero(self):
         parser = AnalizadorSintactico(Lenguaje(["c"], {"f": 2, "g": 0}, {"R": 2, "Q": 0}))
@@ -125,8 +126,7 @@ class LenguajeTests(unittest.TestCase):
                  lambda: Lenguaje(constantes="abc"),
                  lambda: Lenguaje(funciones={"a": 1}, constantes=["a"]),
                  lambda: Lenguaje(funciones={"P": 1}, predicados={"P": 1}),
-                 lambda: Lenguaje(predicados={"P mala": 1}),
-                 lambda: Lenguaje(predicados={"forall": 1})]
+                 lambda: Lenguaje(predicados={"P mala": 1})]
         for i, caso in enumerate(casos):
             with self.subTest(i=i), self.assertRaises(ErrorLenguaje):
                 caso()

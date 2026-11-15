@@ -56,7 +56,7 @@ Orden de mayor a menor precedencia: paréntesis; prefijos `¬`, `∀`, `∃`; `�
 
 El cuantificador alcanza el prefijo que sigue. `∀x P(x) → P(x)` deja libre la segunda `x`; escribir `∀x (P(x) → P(x))` para cuantificar toda la implicación. Para separar una variable de un predicado sin paréntesis, usar espacio: `∀x P(x)`. También se admite `∀x(P(x))`.
 
-Se admiten alias de teclado: `~` / `!`, `&`, `|`, `->`, `forall`, `exists`. Los nombres tienen la forma `[A-Za-z_][A-Za-z_0-9]*`, distinguen mayúsculas y minúsculas, y no pueden ser `forall` ni `exists`.
+Los nombres tienen la forma `[A-Za-z_][A-Za-z_0-9]*` y distinguen mayúsculas y minúsculas.
 
 Un identificador no declarado que aparece como término sin argumentos se interpreta como variable, ya que las variables no se declaran. Un predicado desconocido o una función desconocida con paréntesis siempre es un error. Los nombres de símbolos declarados no se pueden reutilizar como variables.
 

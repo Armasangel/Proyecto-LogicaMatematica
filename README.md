@@ -17,7 +17,7 @@ xvfb-run -a python -B -m unittest discover -s tests -v   # Linux sin pantalla (i
 2. **Interpretación:** dominio `1, 2, 3, 4`; valor de cada constante; tabla de cada función
    (una línea por entrada, `1, 2 -> 3`) y relación de cada predicado (una tupla por línea, `(1, 2)`).
    El botón *Rellenar tablas de funciones vacías* genera todas las entradas de 𝒟ⁿ.
-3. **Fórmula y entorno:** botones ¬ ∧ ∨ → ∀ ∃ ( ) o teclado (`~ ! & | -> forall exists`).
+3. **Fórmula y entorno:** botones ¬ ∧ ∨ → ∀ ∃ ( ).
    Las variables libres se detectan y piden un valor de 𝒟 (entorno σ).
 
 El resultado muestra **Verdadero/Falso** y la justificación: testigo (∃ verdadero),

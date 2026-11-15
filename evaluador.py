@@ -1,4 +1,4 @@
-﻿# Evaluador sem├íntico de la l├│gica de primer orden con justificaciones.
+# Evaluador semántico de la lógica de primer orden con justificaciones.
 
 # Contrato con el controlador:
 #    Evaluador().evaluar(arbol) -> (valor: bool, explicacion: str)
@@ -10,7 +10,7 @@ from nodos import (
 )
 
 
-#  Juicio: resultado de evaluar una (sub)f├│rmula + su justificaci├│n
+#  Juicio: resultado de evaluar una (sub)fórmula + su justificación
 
 class Juicio:
     def __init__(self, valor, formula, razon, hijos=None,
@@ -19,9 +19,9 @@ class Juicio:
         self.formula = formula
         self.razon = razon
         self.hijos = hijos or []
-        self.testigo = testigo              # elemento d de un Ôêâ verdadero
-        self.contraejemplo = contraejemplo  # elemento d de un ÔêÇ falso
-        self.etiqueta = etiqueta            # p. ej. "xÔåª2" en hijos de cuantificadores
+        self.testigo = testigo              # elemento d de un ∃ verdadero
+        self.contraejemplo = contraejemplo  # elemento d de un ∀ falso
+        self.etiqueta = etiqueta            # p. ej. "x↦2" en hijos de cuantificadores
 
     def texto(self, max_hijos=10, prof_max=None):
         return "\n".join(self._lineas(0, max_hijos, prof_max))
@@ -38,7 +38,7 @@ class Juicio:
         resto = len(self.hijos) - max_hijos
         if resto > 0:
             salida.append(
-                f"{sangria}    ÔÇª y {resto} elementos m├ís con el mismo resultado "
+                f"{sangria}    … y {resto} elementos más con el mismo resultado "
                 f"(todos fueron comprobados)."
             )
         return salida
@@ -60,10 +60,10 @@ class Evaluador:
         self.entorno = entorno or Entorno()
         self.ultimo_juicio = None
 
-    # t├®rminos 
+    # términos 
 
     def evaluar_termino(self, termino, sigma=None):
-        # Valor de un t├®rmino en ÔäÉ bajo ¤â (variables, constantes, f anidadas).
+        # Valor de un término en ℐ bajo σ (variables, constantes, f anidadas).
         sigma = self.entorno if sigma is None else sigma
         I = self.interpretacion
         if isinstance(termino, Variable):
@@ -73,31 +73,31 @@ class Evaluador:
         if isinstance(termino, Funcion):
             args = tuple(self.evaluar_termino(a, sigma) for a in termino.args)
             return I.aplicar_funcion(termino.nombre, args)
-        raise ErrorSemantico(f"T├®rmino desconocido: {termino!r}")
+        raise ErrorSemantico(f"Término desconocido: {termino!r}")
 
-    # f├│rmulas 
+    # fórmulas 
 
     def evaluar_formula(self, formula, sigma=None):
-        # Eval├║a una f├│rmula bajo ¤â y devuelve un Juicio con la justificaci├│n.
+        # Evalúa una fórmula bajo σ y devuelve un Juicio con la justificación.
         sigma = self.entorno if sigma is None else sigma
         sin_valor = sorted(v for v in variables_libres(formula) if v not in sigma)
         if sin_valor:
             raise ErrorSemantico(
                 "Variables libres sin valor en el entorno: "
                 + ", ".join(sin_valor)
-                + ". Cuantif├¡quelas (ÔêÇ/Ôêâ) o as├¡gneles un valor."
+                + ". Cuantifíquelas (∀/∃) o asígneles un valor."
             )
         return self._formula(formula, sigma)
 
     def evaluar(self, arbol):
-        # Interfaz para el controlador: (valor, explicaci├│n en texto).
+        # Interfaz para el controlador: (valor, explicación en texto).
         if isinstance(arbol, Termino):
-            raise ErrorSemantico("Se esperaba una f├│rmula, no un t├®rmino.")
+            raise ErrorSemantico("Se esperaba una fórmula, no un término.")
         juicio = self.evaluar_formula(arbol)
         self.ultimo_juicio = juicio
         return juicio.valor, juicio.texto()
 
-    # recursi├│n 
+    # recursión 
 
     def _formula(self, f, sigma):
         if isinstance(f, Predicado):
@@ -114,14 +114,14 @@ class Evaluador:
             return self._para_todo(f, sigma)
         if isinstance(f, Existe):
             return self._existe(f, sigma)
-        raise ErrorSemantico(f"F├│rmula desconocida: {f!r}")
+        raise ErrorSemantico(f"Fórmula desconocida: {f!r}")
 
     def _predicado(self, f, sigma):
         valores = tuple(self.evaluar_termino(a, sigma) for a in f.args)
         pertenece = self.interpretacion.satisface(f.nombre, valores)
         detalle = ", ".join(f"{a} = {v}" for a, v in zip(f.args, valores))
-        rel = "Ôêê" if pertenece else "Ôêë"
-        razon = f"{detalle}; {_fmt_tupla(valores)} {rel} {f.nombre}^ÔäÉ"
+        rel = "∈" if pertenece else "∉"
+        razon = f"{detalle}; {_fmt_tupla(valores)} {rel} {f.nombre}^ℐ"
         return Juicio(pertenece, f, razon)
 
     def _negacion(self, f, sigma):
@@ -161,7 +161,7 @@ class Evaluador:
         if not ant.valor:
             return Juicio(
                 True, f,
-                f"el antecedente ({f.izq}) es falso, as├¡ que se cumple por vacuidad",
+                f"el antecedente ({f.izq}) es falso, así que se cumple por vacuidad",
                 [ant],
             )
         cons = self._formula(f.der, sigma)
@@ -175,25 +175,25 @@ class Evaluador:
             [ant, cons],
         )
 
-    # cuantificadores (¤â[xÔåªd]) 
+    # cuantificadores (σ[x↦d]) 
 
     def _para_todo(self, f, sigma):
         x, dom = f.variable, self.interpretacion.dominio
         hijos = []
         for d in dom:
             h = self._formula(f.cuerpo, sigma.modificado(x, d))
-            h.etiqueta = f"{x}Ôåª{d}"
+            h.etiqueta = f"{x}↦{d}"
             if not h.valor:
                 return Juicio(
                     False, f,
-                    f"contraejemplo {x} = {d}: con ¤â[{x}Ôåª{d}], {f.cuerpo} es falsa",
+                    f"contraejemplo {x} = {d}: con σ[{x}↦{d}], {f.cuerpo} es falsa",
                     [h], contraejemplo=d,
                 )
             hijos.append(h)
         return Juicio(
             True, f,
-            f"comprobaci├│n completa: los {len(dom)} elementos de "
-            f"­ØÆƒ = {_fmt_dominio(dom)} satisfacen {f.cuerpo}",
+            f"comprobación completa: los {len(dom)} elementos de "
+            f"𝒟 = {_fmt_dominio(dom)} satisfacen {f.cuerpo}",
             hijos,
         )
 
@@ -202,26 +202,26 @@ class Evaluador:
         hijos = []
         for d in dom:
             h = self._formula(f.cuerpo, sigma.modificado(x, d))
-            h.etiqueta = f"{x}Ôåª{d}"
+            h.etiqueta = f"{x}↦{d}"
             if h.valor:
                 return Juicio(
                     True, f,
-                    f"testigo {x} = {d}: con ¤â[{x}Ôåª{d}], {f.cuerpo} es verdadera",
+                    f"testigo {x} = {d}: con σ[{x}↦{d}], {f.cuerpo} es verdadera",
                     [h], testigo=d,
                 )
             hijos.append(h)
         return Juicio(
             False, f,
-            f"comprobaci├│n completa: ninguno de los {len(dom)} elementos de "
-            f"­ØÆƒ = {_fmt_dominio(dom)} satisface {f.cuerpo}",
+            f"comprobación completa: ninguno de los {len(dom)} elementos de "
+            f"𝒟 = {_fmt_dominio(dom)} satisface {f.cuerpo}",
             hijos,
         )
 
 
-#  Interpretaci├│n de ejemplo (la usa Evaluador() sin argumentos)
+#  Interpretación de ejemplo (la usa Evaluador() sin argumentos)
 
 def interpretacion_ejemplo():
-    # ­ØÆƒ = {1,2,3,4}; a=1, b=3; s = sucesor (4Ôåª4); P = pares; M = '<'.
+    # 𝒟 = {1,2,3,4}; a=1, b=3; s = sucesor (4↦4); P = pares; M = '<'.
     dominio = [1, 2, 3, 4]
     return Interpretacion(
         dominio,

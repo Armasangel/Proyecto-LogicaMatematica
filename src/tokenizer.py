@@ -14,8 +14,7 @@ class Token:
 
 
 class Tokenizer:
-    SIMBOLOS = {"¬": "NO", "~": "NO", "!": "NO", "∧": "Y", "&": "Y",
-                "∨": "O", "|": "O", "→": "IMPLICA", "∀": "TODOS",
+    SIMBOLOS = {"¬": "NO", "∧": "Y", "∨": "O", "→": "IMPLICA", "∀": "TODOS",
                 "∃": "EXISTE", "(": "ABRE", ")": "CIERRA", ",": "COMA", ".": "PUNTO"}
 
     def tokenizar(self, texto):
@@ -26,10 +25,6 @@ class Tokenizer:
             if texto[i].isspace():
                 i += 1
                 continue
-            if texto.startswith("->", i):
-                tokens.append(Token("IMPLICA", "->", i))
-                i += 2
-                continue
             if texto[i] in self.SIMBOLOS:
                 tokens.append(Token(self.SIMBOLOS[texto[i]], texto[i], i))
                 i += 1
@@ -37,8 +32,7 @@ class Tokenizer:
             nombre = re.match(r"[A-Za-z_][A-Za-z_0-9]*", texto[i:])
             if nombre:
                 valor = nombre.group()
-                tipo = {"forall": "TODOS", "exists": "EXISTE"}.get(valor, "ID")
-                tokens.append(Token(tipo, valor, i))
+                tokens.append(Token("ID", valor, i))
                 i += len(valor)
                 continue
             raise ErrorLexico(f"Carácter no permitido: {texto[i]!r}.", posicion=i, texto=texto)

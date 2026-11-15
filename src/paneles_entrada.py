@@ -192,8 +192,7 @@ class PanelFormula(tk.Frame):
 
         TecladoLogico(self, al_presionar=self.insertar,
                       al_borrar=self.borrar_caracter).pack(fill="x")
-        _etiqueta(self, "También puede escribir con el teclado: ~ ! & | -> forall exists",
-                  negrita=False, color=COLOR_AYUDA, pady=(6, 10))
+        tk.Frame(self, bg=COLOR_TARJETA, height=10).pack()
 
         self.etiqueta_libres = tk.Label(self, text="Variables libres: (aún sin analizar)",
                                         bg=COLOR_TARJETA, font=(FUENTE, 11, "bold"))

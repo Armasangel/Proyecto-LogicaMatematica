@@ -9,8 +9,7 @@ from errores import ErrorLenguaje
 
 def validar_nombre(nombre, ruta="lenguaje"):
     if (not isinstance(nombre, str)
-            or re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*", nombre) is None
-            or nombre in {"forall", "exists"}):
+            or re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*", nombre) is None):
         raise ErrorLenguaje(f"Nombre de símbolo inválido: {nombre!r}.", ruta=ruta)
 
 
